@@ -26,6 +26,8 @@ import java.lang.reflect.WildcardType;
 import java.util.Arrays;
 
 /**
+ * 帮助解析字段、方法、方法返回值的类型
+ *
  * @author Iwao AVE!
  */
 public class TypeParameterResolver {
@@ -41,8 +43,8 @@ public class TypeParameterResolver {
    *         they will be resolved to the actual runtime {@link Type}s.
    */
   public static Type resolveFieldType(Field field, Type srcType) {
-    Type fieldType = field.getGenericType();
-    Class<?> declaringClass = field.getDeclaringClass();
+    Type fieldType = field.getGenericType();  // 获取字段的声明类型
+    Class<?> declaringClass = field.getDeclaringClass();  // 获取字段定义所在的类的 Class 对象
     return resolveType(fieldType, srcType, declaringClass);
   }
 
@@ -84,11 +86,11 @@ public class TypeParameterResolver {
   }
 
   private static Type resolveType(Type type, Type srcType, Class<?> declaringClass) {
-    if (type instanceof TypeVariable) {
+    if (type instanceof TypeVariable) { // 类型变量
       return resolveTypeVar((TypeVariable<?>) type, srcType, declaringClass);
-    } else if (type instanceof ParameterizedType) {
+    } else if (type instanceof ParameterizedType) { // 参数化类型
       return resolveParameterizedType((ParameterizedType) type, srcType, declaringClass);
-    } else if (type instanceof GenericArrayType) {
+    } else if (type instanceof GenericArrayType) {  // 数组类型，且组成元素类型是 TypeVariable 或 ParameterizedType
       return resolveGenericArrayType((GenericArrayType) type, srcType, declaringClass);
     } else {
       return type;
@@ -113,7 +115,7 @@ public class TypeParameterResolver {
   }
 
   private static ParameterizedType resolveParameterizedType(ParameterizedType parameterizedType, Type srcType, Class<?> declaringClass) {
-    Class<?> rawType = (Class<?>) parameterizedType.getRawType();
+    Class<?> rawType = (Class<?>) parameterizedType.getRawType(); // 获取参数化类型中的原始类型，如 Map<String, String> 就是 Map
     Type[] typeArgs = parameterizedType.getActualTypeArguments();
     Type[] args = new Type[typeArgs.length];
     for (int i = 0; i < typeArgs.length; i++) {

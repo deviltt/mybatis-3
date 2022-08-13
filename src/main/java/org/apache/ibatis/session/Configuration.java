@@ -96,6 +96,9 @@ import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 
 /**
+ * Configuration 是 Mybatis 全局性的配置对象
+ * 所有的配置信息会被解析成相应的对象并记录到 Configuration 对象中
+ *
  * @author Clinton Begin
  */
 public class Configuration {

@@ -169,6 +169,7 @@ public class MetaClass {
   }
 
   private StringBuilder buildProperty(String name, StringBuilder builder) {
+    // 通过 PropertyTokenizer 解析复杂的属性表达式
     PropertyTokenizer prop = new PropertyTokenizer(name);
     if (prop.hasNext()) {
       String propertyName = reflector.findPropertyName(prop.getName());
@@ -178,7 +179,7 @@ public class MetaClass {
         MetaClass metaProp = metaClassForProperty(propertyName);
         metaProp.buildProperty(prop.getChildren(), builder);
       }
-    } else {
+    } else {  // 递归终止条件
       String propertyName = reflector.findPropertyName(name);
       if (propertyName != null) {
         builder.append(propertyName);

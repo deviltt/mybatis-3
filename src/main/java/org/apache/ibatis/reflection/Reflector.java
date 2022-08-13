@@ -52,17 +52,18 @@ import org.apache.ibatis.util.MapUtil;
  * @author Clinton Begin
  */
 public class Reflector {
-
+  // 主要为了适配高版本的 jdk，高版本 jdk 的 Class 中有 isRecord 方法，jdk8 是没有的
   private static final MethodHandle isRecordMethodHandle = getIsRecordMethodHandle();
-  private final Class<?> type;
-  private final String[] readablePropertyNames;
-  private final String[] writablePropertyNames;
+  private final Class<?> type;  // 原始 class 类型
+  private final String[] readablePropertyNames; // 可读属性集合
+  private final String[] writablePropertyNames; // 可写属性集合
   private final Map<String, Invoker> setMethods = new HashMap<>();
   private final Map<String, Invoker> getMethods = new HashMap<>();
-  private final Map<String, Class<?>> setTypes = new HashMap<>();
-  private final Map<String, Class<?>> getTypes = new HashMap<>();
-  private Constructor<?> defaultConstructor;
+  private final Map<String, Class<?>> setTypes = new HashMap<>(); // setter 方法的参数类型
+  private final Map<String, Class<?>> getTypes = new HashMap<>(); // getter 方法的返回值类型
+  private Constructor<?> defaultConstructor;  // 记录了默认构造方法
 
+  // 记录所有属性名称的集合
   private Map<String, String> caseInsensitivePropertyMap = new HashMap<>();
 
   public Reflector(Class<?> clazz) {
@@ -92,12 +93,14 @@ public class Reflector {
   }
 
   private void addDefaultConstructor(Class<?> clazz) {
+    // 获取类里面所有作用域范围的构造方法
     Constructor<?>[] constructors = clazz.getDeclaredConstructors();
     Arrays.stream(constructors).filter(constructor -> constructor.getParameterTypes().length == 0)
       .findAny().ifPresent(constructor -> this.defaultConstructor = constructor);
   }
 
   private void addGetMethods(Method[] methods) {
+    // 方法名和方法的映射
     Map<String, List<Method>> conflictingGetters = new HashMap<>();
     Arrays.stream(methods).filter(m -> m.getParameterTypes().length == 0 && PropertyNamer.isGetter(m.getName()))
       .forEach(m -> addMethodConflict(conflictingGetters, PropertyNamer.methodToProperty(m.getName()), m));
@@ -198,9 +201,9 @@ public class Reflector {
       return setter1;
     }
     MethodInvoker invoker = new AmbiguousMethodInvoker(setter1,
-        MessageFormat.format(
-            "Ambiguous setters defined for property ''{0}'' in class ''{1}'' with types ''{2}'' and ''{3}''.",
-            property, setter2.getDeclaringClass().getName(), paramType1.getName(), paramType2.getName()));
+      MessageFormat.format(
+        "Ambiguous setters defined for property ''{0}'' in class ''{1}'' with types ''{2}'' and ''{3}''.",
+        property, setter2.getDeclaringClass().getName(), paramType1.getName(), paramType2.getName()));
     setMethods.put(property, invoker);
     Type[] paramTypes = TypeParameterResolver.resolveParamTypes(setter1, type);
     setTypes.put(property, typeToClass(paramTypes[0]));
@@ -289,15 +292,19 @@ public class Reflector {
     Map<String, Method> uniqueMethods = new HashMap<>();
     Class<?> currentClass = clazz;
     while (currentClass != null && currentClass != Object.class) {
+      // 记录 class 类中所有的方法
       addUniqueMethods(uniqueMethods, currentClass.getDeclaredMethods());
 
       // we also need to look for interface methods -
       // because the class may be abstract
+      // 抽象类可以不实现接口里的方法，所以如果是抽象类，需要把接口里的方法也扫描出来
       Class<?>[] interfaces = currentClass.getInterfaces();
-      for (Class<?> anInterface : interfaces) {
+      for (Class<?> anInterface : interfaces) { // 遍历每个接口
+        // 获取接口里的所有方法
         addUniqueMethods(uniqueMethods, anInterface.getMethods());
       }
 
+      // 获取父类，然后递归找方法
       currentClass = currentClass.getSuperclass();
     }
 
@@ -464,14 +471,16 @@ public class Reflector {
    */
   private static boolean isRecord(Class<?> clazz) {
     try {
-      return isRecordMethodHandle != null && (boolean)isRecordMethodHandle.invokeExact(clazz);
+      return isRecordMethodHandle != null && (boolean) isRecordMethodHandle.invokeExact(clazz);
     } catch (Throwable e) {
       throw new ReflectionException("Failed to invoke 'Class.isRecord()'.", e);
     }
   }
 
   private static MethodHandle getIsRecordMethodHandle() {
+    // 所有方法的 lookup，public 方法的 Lookup 使用 MethodHandles.publicLookup()
     MethodHandles.Lookup lookup = MethodHandles.lookup();
+    // 方法返回类型为 boolean 类型
     MethodType mt = MethodType.methodType(boolean.class);
     try {
       return lookup.findVirtual(Class.class, "isRecord", mt);

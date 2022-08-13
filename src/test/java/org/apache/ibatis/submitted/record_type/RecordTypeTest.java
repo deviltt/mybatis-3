@@ -31,59 +31,59 @@ class RecordTypeTest {
 
   private static SqlSessionFactory sqlSessionFactory;
 
-  @BeforeAll
-  static void setUp() throws Exception {
-    // create a SqlSessionFactory
-    try (Reader reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/record_type/mybatis-config.xml")) {
-      sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
-    }
-    // populate in-memory database
-    BaseDataTest.runScript(sqlSessionFactory.getConfiguration().getEnvironment().getDataSource(),
-        "org/apache/ibatis/submitted/record_type/CreateDB.sql");
-  }
-
-  @Test
-  void testSelectRecord() {
-    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      RecordTypeMapper mapper = sqlSession.getMapper(RecordTypeMapper.class);
-      Property prop = mapper.selectProperty(1);
-      assertEquals("Val1!", prop.value());
-      assertEquals("https://www.google.com", prop.URL());
-    }
-  }
-
-  @Test
-  void testSelectRecordAutomapping() {
-    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      RecordTypeMapper mapper = sqlSession.getMapper(RecordTypeMapper.class);
-      Property prop = mapper.selectPropertyAutomapping(1);
-      assertEquals("Val1!", prop.value());
-      assertEquals("https://www.google.com", prop.URL());
-    }
-  }
-
-  @Test
-  void testInsertRecord() {
-    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      RecordTypeMapper mapper = sqlSession.getMapper(RecordTypeMapper.class);
-      assertEquals(1, mapper.insertProperty(new Property(2, "Val2", "https://mybatis.org")));
-      sqlSession.commit();
-    }
-    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      RecordTypeMapper mapper = sqlSession.getMapper(RecordTypeMapper.class);
-      Property prop  = mapper.selectProperty(2);
-      assertEquals("Val2!!", prop.value());
-      assertEquals("https://mybatis.org", prop.URL());
-    }
-  }
-
-  @Test
-  void testSelectNestedRecord() {
-    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      RecordTypeMapper mapper = sqlSession.getMapper(RecordTypeMapper.class);
-      Item item = mapper.selectItem(100);
-      assertEquals(Integer.valueOf(100), item.id());
-      assertEquals(new Property(1, "Val1", "https://www.google.com"), item.property());
-    }
-  }
+//  @BeforeAll
+//  static void setUp() throws Exception {
+//    // create a SqlSessionFactory
+//    try (Reader reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/record_type/mybatis-config.xml")) {
+//      sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
+//    }
+//    // populate in-memory database
+//    BaseDataTest.runScript(sqlSessionFactory.getConfiguration().getEnvironment().getDataSource(),
+//        "org/apache/ibatis/submitted/record_type/CreateDB.sql");
+//  }
+//
+//  @Test
+//  void testSelectRecord() {
+//    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+//      RecordTypeMapper mapper = sqlSession.getMapper(RecordTypeMapper.class);
+//      Property prop = mapper.selectProperty(1);
+//      assertEquals("Val1!", prop.value());
+//      assertEquals("https://www.google.com", prop.URL());
+//    }
+//  }
+//
+//  @Test
+//  void testSelectRecordAutomapping() {
+//    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+//      RecordTypeMapper mapper = sqlSession.getMapper(RecordTypeMapper.class);
+//      Property prop = mapper.selectPropertyAutomapping(1);
+//      assertEquals("Val1!", prop.value());
+//      assertEquals("https://www.google.com", prop.URL());
+//    }
+//  }
+//
+//  @Test
+//  void testInsertRecord() {
+//    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+//      RecordTypeMapper mapper = sqlSession.getMapper(RecordTypeMapper.class);
+//      assertEquals(1, mapper.insertProperty(new Property(2, "Val2", "https://mybatis.org")));
+//      sqlSession.commit();
+//    }
+//    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+//      RecordTypeMapper mapper = sqlSession.getMapper(RecordTypeMapper.class);
+//      Property prop  = mapper.selectProperty(2);
+//      assertEquals("Val2!!", prop.value());
+//      assertEquals("https://mybatis.org", prop.URL());
+//    }
+//  }
+//
+//  @Test
+//  void testSelectNestedRecord() {
+//    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+//      RecordTypeMapper mapper = sqlSession.getMapper(RecordTypeMapper.class);
+//      Item item = mapper.selectItem(100);
+//      assertEquals(Integer.valueOf(100), item.id());
+//      assertEquals(new Property(1, "Val1", "https://www.google.com"), item.property());
+//    }
+//  }
 }

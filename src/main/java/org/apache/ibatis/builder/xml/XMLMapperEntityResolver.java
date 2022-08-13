@@ -32,7 +32,9 @@ import org.xml.sax.SAXException;
  */
 public class XMLMapperEntityResolver implements EntityResolver {
 
+  // config 是用来处理配置文件的
   private static final String IBATIS_CONFIG_SYSTEM = "ibatis-3-config.dtd";
+  // mapper 是用来解析 sql mapper 文件的
   private static final String IBATIS_MAPPER_SYSTEM = "ibatis-3-mapper.dtd";
   private static final String MYBATIS_CONFIG_SYSTEM = "mybatis-3-config.dtd";
   private static final String MYBATIS_MAPPER_SYSTEM = "mybatis-3-mapper.dtd";

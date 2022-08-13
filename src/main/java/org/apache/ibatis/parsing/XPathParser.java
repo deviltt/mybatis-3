@@ -47,9 +47,9 @@ import org.xml.sax.SAXParseException;
 public class XPathParser {
 
   private final Document document;
-  private boolean validation;
-  private EntityResolver entityResolver;
-  private Properties variables;
+  private boolean validation; // 是否开启验证
+  private EntityResolver entityResolver;  // 用于加载本地 DTD 文件，目前 mybatis 只有一个 XMLMapperEntityResolver 实现 EntityResolver
+  private Properties variables; // mybatis-config.xml 中 <properties> 标签定义的键值对集合
   private XPath xpath;
 
   public XPathParser(String xml) {
@@ -241,7 +241,9 @@ public class XPathParser {
       factory.setExpandEntityReferences(true);
 
       DocumentBuilder builder = factory.newDocumentBuilder();
+      // 设置解析规范
       builder.setEntityResolver(entityResolver);
+      // 设置异常处理回调
       builder.setErrorHandler(new ErrorHandler() {
         @Override
         public void error(SAXParseException exception) throws SAXException {
@@ -258,6 +260,7 @@ public class XPathParser {
           // NOP
         }
       });
+      // 加载 xml 文件
       return builder.parse(inputSource);
     } catch (Exception e) {
       throw new BuilderException("Error creating document instance.  Cause: " + e, e);

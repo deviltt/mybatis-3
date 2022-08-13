@@ -28,6 +28,8 @@ import org.apache.ibatis.reflection.wrapper.ObjectWrapper;
 import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
 
 /**
+ * 解析属性表达式
+ *
  * @author Clinton Begin
  */
 public class MetaObject {

@@ -49,6 +49,8 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.Configuration;
 
 /**
+ * 管理众多 TypeHandler 接口实现，确定使用哪个 TypeHandler 接口实现完成转换
+ *
  * @author Clinton Begin
  * @author Kazuki Shimizu
  */

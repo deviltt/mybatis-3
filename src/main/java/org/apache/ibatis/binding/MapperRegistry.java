@@ -58,7 +58,7 @@ public class MapperRegistry {
   }
 
   public <T> void addMapper(Class<T> type) {
-    if (type.isInterface()) {
+    if (type.isInterface()) { // 这里就卡死了，必须是 dao 层的接口
       if (hasMapper(type)) {
         throw new BindingException("Type " + type + " is already known to the MapperRegistry.");
       }

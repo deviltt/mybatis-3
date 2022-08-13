@@ -69,7 +69,7 @@ public class SoftCache implements Cache {
     SoftReference<Object> softReference = (SoftReference<Object>) delegate.getObject(key);
     if (softReference != null) {
       result = softReference.get();
-      if (result == null) {
+      if (result == null) { // result 为 null，说明 value 已经被 GC 掉了，此时需要把 key 也删掉
         delegate.removeObject(key);
       } else {
         // See #586 (and #335) modifications need more than a read lock
