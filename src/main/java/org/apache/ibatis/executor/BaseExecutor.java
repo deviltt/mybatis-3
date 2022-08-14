@@ -45,20 +45,31 @@ import org.apache.ibatis.transaction.Transaction;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 
 /**
+ * 提供了缓存管理和事务管理两大功能
+ *
  * @author Clinton Begin
  */
 public abstract class BaseExecutor implements Executor {
 
   private static final Log log = LogFactory.getLog(BaseExecutor.class);
 
+  // 事务对象，实现事物的提交、回滚和关闭操作
   protected Transaction transaction;
+
+  // 封装的 Executor 对象
   protected Executor wrapper;
 
+  // 延迟加载队列
   protected ConcurrentLinkedQueue<DeferredLoad> deferredLoads;
+
+  // 一级缓存，用于缓存该 Executor 对象查询结果集映射得到的结果对象
   protected PerpetualCache localCache;
+
+  // 一级缓存，用于缓存输出类型的参数
   protected PerpetualCache localOutputParameterCache;
   protected Configuration configuration;
 
+  // 用于记录嵌套查询的层数
   protected int queryStack;
   private boolean closed;
 

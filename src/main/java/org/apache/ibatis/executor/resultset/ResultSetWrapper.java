@@ -41,15 +41,28 @@ import org.apache.ibatis.type.UnknownTypeHandler;
  */
 public class ResultSetWrapper {
 
-  private final ResultSet resultSet;
+  private final ResultSet resultSet;  // 底层封装的 ResultSet 对象
+
   private final TypeHandlerRegistry typeHandlerRegistry;
+
+  // 记录了 ResultSet 中每列的列名
   private final List<String> columnNames = new ArrayList<>();
+
+  // 记录 ResultSet 中每列对应的 Java 类型
   private final List<String> classNames = new ArrayList<>();
+
+  // 记录 ResultSet 中每列对应的 JdbcType 类型
   private final List<JdbcType> jdbcTypes = new ArrayList<>();
+
   private final Map<String, Map<Class<?>, TypeHandler<?>>> typeHandlerMap = new HashMap<>();
+
+  // 记录被映射的列名，其中 key 是 ResultMap 对象的 id，value 是该 ResultMap 对象映射的列名集合
   private final Map<String, List<String>> mappedColumnNamesMap = new HashMap<>();
+
+  // 记录未映射的列名，其中 key 是 ResultMap 对象的 id，value 是该 ResultMap 对象映射的列名集合
   private final Map<String, List<String>> unMappedColumnNamesMap = new HashMap<>();
 
+  // 会初始化 columnNames、jdbcTypes、classNames 三个集合
   public ResultSetWrapper(ResultSet rs, Configuration configuration) throws SQLException {
     super();
     this.typeHandlerRegistry = configuration.getTypeHandlerRegistry();

@@ -91,14 +91,21 @@ public class XMLMapperBuilder extends BaseBuilder {
   }
 
   public void parse() {
+    // 判断是否已经加载过该映射文件
     if (!configuration.isResourceLoaded(resource)) {
+      // 处理 mapper 节点
       configurationElement(parser.evalNode("/mapper"));
+      // 将 resource 放到 Configuration 对象中保存，表示这个 resource 已经加载过了
       configuration.addLoadedResource(resource);
+      // 注册 mapper 接口
       bindMapperForNamespace();
     }
 
+    // 处理 configurationElement 方法中解析失败的 <resultMap> 节点
     parsePendingResultMaps();
+    // 处理 configurationElement 方法中解析失败的 <cache-ref> 节点
     parsePendingCacheRefs();
+    // 处理 configurationElement 方法中解析失败的 <sql> 节点
     parsePendingStatements();
   }
 
@@ -109,10 +116,13 @@ public class XMLMapperBuilder extends BaseBuilder {
   private void configurationElement(XNode context) {
     try {
       String namespace = context.getStringAttribute("namespace");
+      // 必须要设置 namespace
       if (namespace == null || namespace.isEmpty()) {
         throw new BuilderException("Mapper's namespace cannot be empty");
       }
       builderAssistant.setCurrentNamespace(namespace);
+
+      // mapper 里面一共就是 9 个标签
       cacheRefElement(context.evalNode("cache-ref"));
       cacheElement(context.evalNode("cache"));
       parameterMapElement(context.evalNodes("/mapper/parameterMap"));
@@ -203,12 +213,14 @@ public class XMLMapperBuilder extends BaseBuilder {
     if (context != null) {
       String type = context.getStringAttribute("type", "PERPETUAL");
       Class<? extends Cache> typeClass = typeAliasRegistry.resolveAlias(type);
+      // 默认使用 LRU 缓存
       String eviction = context.getStringAttribute("eviction", "LRU");
       Class<? extends Cache> evictionClass = typeAliasRegistry.resolveAlias(eviction);
       Long flushInterval = context.getLongAttribute("flushInterval");
       Integer size = context.getIntAttribute("size");
       boolean readWrite = !context.getBooleanAttribute("readOnly", false);
       boolean blocking = context.getBooleanAttribute("blocking", false);
+      // 获取 <cache> 节点下的子节点，将用于初始化二级缓存
       Properties props = context.getChildrenAsProperties();
       builderAssistant.useNewCache(typeClass, evictionClass, flushInterval, size, readWrite, blocking, props);
     }
@@ -416,19 +428,24 @@ public class XMLMapperBuilder extends BaseBuilder {
   }
 
   private void bindMapperForNamespace() {
+    // 获取映射配置文件的命名空间
     String namespace = builderAssistant.getCurrentNamespace();
     if (namespace != null) {
       Class<?> boundType = null;
       try {
+        // 解析命名空间对应的类型
         boundType = Resources.classForName(namespace);
       } catch (ClassNotFoundException e) {
         // ignore, bound type is not required
       }
+      // 命名空间对应的类型不为空，并且没有加载过 boundType 接口
       if (boundType != null && !configuration.hasMapper(boundType)) {
         // Spring may not know the real resource name so we set a flag
         // to prevent loading again this resource from the mapper interface
         // look at MapperAnnotationBuilder#loadXmlResource
+        // 添加 namespace: 前缀，添加到已经加载过的命名空间集合 loadedResources 中
         configuration.addLoadedResource("namespace:" + namespace);
+        // 调用 MapperRegistry.addMapper() 方法，注册 boundType 接口
         configuration.addMapper(boundType);
       }
     }

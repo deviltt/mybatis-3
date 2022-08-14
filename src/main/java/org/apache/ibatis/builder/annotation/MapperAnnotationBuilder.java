@@ -118,8 +118,11 @@ public class MapperAnnotationBuilder {
       loadXmlResource();
       configuration.addLoadedResource(resource);
       assistant.setCurrentNamespace(type.getName());
+      // 解析 @CacheNamespace 注解
       parseCache();
+      // 解析 @CacheNamespaceRef 注解
       parseCacheRef();
+      // 遍历接口中所有的方法
       for (Method method : type.getMethods()) {
         if (!canHaveStatement(method)) {
           continue;
@@ -129,12 +132,14 @@ public class MapperAnnotationBuilder {
           parseResultMap(method);
         }
         try {
+          // todo 关键方法，暂时不太理解
           parseStatement(method);
         } catch (IncompleteElementException e) {
           configuration.addIncompleteMethod(new MethodResolver(this, method));
         }
       }
     }
+    // 遍历 Configuration.incompleteMethods 集合中记录的未解析的方法，并重新进行解析
     parsePendingMethods();
   }
 

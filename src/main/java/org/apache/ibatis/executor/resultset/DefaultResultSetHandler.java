@@ -181,13 +181,20 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     }
   }
 
-  //
-  // HANDLE RESULT SETS
-  //
+  /**
+   * HANDLE RESULT SETS
+   * 不仅可以处理 Statement、PrepareStatement 产生的结果集，还可以处理
+   * CallableStatement 调用存储过程产生的多结果集
+   *
+   * @param stmt
+   * @return
+   * @throws SQLException
+   */
   @Override
   public List<Object> handleResultSets(Statement stmt) throws SQLException {
     ErrorContext.instance().activity("handling results").object(mappedStatement.getId());
 
+    // 用于保存映射结果集得到的结果对象
     final List<Object> multipleResults = new ArrayList<>();
 
     int resultSetCount = 0;
@@ -198,7 +205,9 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     validateResultMapsCount(rsw, resultMapCount);
     while (rsw != null && resultMapCount > resultSetCount) {
       ResultMap resultMap = resultMaps.get(resultSetCount);
+      // 根据 ResultMap 中定义的映射规则对 ResultSet 进行映射，并将映射的结果对象添加到 multipleResults 集合中保存
       handleResultSet(rsw, resultMap, multipleResults, null);
+      // 获取下一个结果集
       rsw = getNextResultSet(stmt);
       cleanUpAfterHandlingResultSet();
       resultSetCount++;
@@ -241,27 +250,30 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   }
 
   private ResultSetWrapper getFirstResultSet(Statement stmt) throws SQLException {
-    ResultSet rs = stmt.getResultSet();
+    ResultSet rs = stmt.getResultSet(); // 获取 ResultSet 对象
     while (rs == null) {
       // move forward to get the first resultset in case the driver
       // doesn't return the resultset as the first result (HSQLDB 2.1)
-      if (stmt.getMoreResults()) {
+      if (stmt.getMoreResults()) {  // 检测是否还有待处理的 ResultSet
         rs = stmt.getResultSet();
       } else {
-        if (stmt.getUpdateCount() == -1) {
+        if (stmt.getUpdateCount() == -1) {  // 没有待处理的 ResultSet
           // no more results. Must be no resultset
           break;
         }
       }
     }
+    // 将结果集非封装成 ResultSetWrapper 对象
     return rs != null ? new ResultSetWrapper(rs, configuration) : null;
   }
 
   private ResultSetWrapper getNextResultSet(Statement stmt) {
     // Making this method tolerant of bad JDBC drivers
     try {
+      // 检测 JDBC 是否支持多结果集
       if (stmt.getConnection().getMetaData().supportsMultipleResultSets()) {
         // Crazy Standard JDBC way of determining if there are more results
+
         if (!(!stmt.getMoreResults() && stmt.getUpdateCount() == -1)) {
           ResultSet rs = stmt.getResultSet();
           if (rs == null) {

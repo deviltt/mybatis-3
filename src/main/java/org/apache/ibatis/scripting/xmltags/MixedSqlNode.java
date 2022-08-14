@@ -18,6 +18,8 @@ package org.apache.ibatis.scripting.xmltags;
 import java.util.List;
 
 /**
+ * contents 记录其子节点对应的 SqlNode 对象集合
+ *
  * @author Clinton Begin
  */
 public class MixedSqlNode implements SqlNode {

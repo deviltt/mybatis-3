@@ -221,10 +221,12 @@ public class XMLConfigBuilder extends BaseBuilder {
 
   private void propertiesElement(XNode context) throws Exception {
     if (context != null) {
+      // 解析 <properties> 的子节点 <property> 标签 的 name 和 value 属性，并记录到 Property 对象中
       Properties defaults = context.getChildrenAsProperties();
+      // 解析 <properties resource="" url=""> 标签中的 resource 和 url
       String resource = context.getStringAttribute("resource");
       String url = context.getStringAttribute("url");
-      if (resource != null && url != null) {
+      if (resource != null && url != null) {  // resource 和 url 不能同时设置
         throw new BuilderException("The properties element cannot specify both a URL and a resource based property file reference.  Please specify one or the other.");
       }
       if (resource != null) {

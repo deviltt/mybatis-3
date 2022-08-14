@@ -33,6 +33,8 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
 /**
+ * 执行的 sql 语句不能存在占位符 (?)，要能解析占位符，可以使用 PreparedStatementHandler
+ *
  * @author Clinton Begin
  */
 public class SimpleStatementHandler extends BaseStatementHandler {
