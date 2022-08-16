@@ -1048,7 +1048,17 @@ public class Configuration {
         throw new IllegalArgumentException(name + " already contains value for " + key
             + (conflictMessageProducer == null ? "" : conflictMessageProducer.apply(super.get(key), value)));
       }
+
+      /*
+       举个例子
+        com.mycache1.MyCache
+        com.mycache2.MyCache
+        解析出来 shortName 都是 MyCache
+        如果 Cache 中已经有 MyCache 了，那肯定是 Ambiguity 的
+        等调用 get() 方法的时候，判断如果 value 是 Ambiguity 类型的就会抛出异常
+       */
       if (key.contains(".")) {
+        // com.mycache.MyCache 解析成 shortKey：MyCache
         final String shortKey = getShortName(key);
         if (super.get(shortKey) == null) {
           super.put(shortKey, value);

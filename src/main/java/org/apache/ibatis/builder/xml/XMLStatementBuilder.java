@@ -71,6 +71,9 @@ public class XMLStatementBuilder extends BaseBuilder {
 
     // Include Fragments before parsing
     XMLIncludeTransformer includeParser = new XMLIncludeTransformer(configuration, builderAssistant);
+
+    // 解析 <include> 标签
+    // 在这个里面对 ${} 符号进行替换，也就是和 #{} 的区别
     includeParser.applyIncludes(context.getNode());
 
     String parameterType = context.getStringAttribute("parameterType");

@@ -171,6 +171,7 @@ class SqlSessionTest extends BaseDataTest {
   @Test
   void shouldSelectAllAuthorsAsMap() {
     try (SqlSession session = sqlMapper.openSession(TransactionIsolationLevel.SERIALIZABLE)) {
+      // 指定 mapKey，然后将 mapKey 和查询结果做映射返回
       final Map<Integer,Author> authors = session.selectMap("org.apache.ibatis.domain.blog.mappers.AuthorMapper.selectAllAuthors", "id");
       assertEquals(2, authors.size());
       for(Map.Entry<Integer,Author> authorEntry : authors.entrySet()) {
