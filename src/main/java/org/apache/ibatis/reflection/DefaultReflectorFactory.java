@@ -40,6 +40,8 @@ public class DefaultReflectorFactory implements ReflectorFactory {
   @Override
   public Reflector findForClass(Class<?> type) {
     if (classCacheEnabled) {
+      // https://blog.csdn.net/qq_42641075/article/details/116948411
+      // ConcurrentHashMap 中 computeIfAbsent、computeIfPresent 有bug
       // synchronized (type) removed see issue #461
       return MapUtil.computeIfAbsent(reflectorMap, type, Reflector::new);
     } else {

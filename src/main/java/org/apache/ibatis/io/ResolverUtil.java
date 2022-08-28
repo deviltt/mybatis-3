@@ -248,6 +248,7 @@ public class ResolverUtil<T> {
     try {
       List<String> children = VFS.getInstance().list(path);
       for (String child : children) {
+        // 如果文件名是以 .class 结尾
         if (child.endsWith(".class")) {
           addIfMatching(test, child);
         }

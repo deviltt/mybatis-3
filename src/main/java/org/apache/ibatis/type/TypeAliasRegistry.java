@@ -146,6 +146,11 @@ public class TypeAliasRegistry {
     }
   }
 
+  /**
+   * 如果类上有 @Alias 注解，则用注解的 value 作为 key，否则就用类名作为 key
+   *
+   * @param type
+   */
   public void registerAlias(Class<?> type) {
     String alias = type.getSimpleName();
     Alias aliasAnnotation = type.getAnnotation(Alias.class);

@@ -103,16 +103,33 @@ public class XMLConfigBuilder extends BaseBuilder {
   private void parseConfiguration(XNode root) {
     try {
       // issue #117 read properties first
+      // 1.解析 <properties> 标签
       propertiesElement(root.evalNode("properties"));
+
+      // 2.解析 <settings> 标签
       Properties settings = settingsAsProperties(root.evalNode("settings"));
       loadCustomVfs(settings);
       loadCustomLogImpl(settings);
+
+      // 3.解析 <aliases> 标签
       typeAliasesElement(root.evalNode("typeAliases"));
+
+      // 4. 解析 <plugins> 标签
       pluginElement(root.evalNode("plugins"));
+
+      // 5.解析 <objectFactory> 标签，创建对象工厂，默认是 DefaultObjectFactory
       objectFactoryElement(root.evalNode("objectFactory"));
+
+      // 6.解析 <objectWrapperFactory>，默认是 DefaultObjectWrapperFactory
       objectWrapperFactoryElement(root.evalNode("objectWrapperFactory"));
+
+      // 7.解析 <reflectorFactory> 标签，
       reflectorFactoryElement(root.evalNode("reflectorFactory"));
+
+      // 为 Configuration 设置 settings 属性
       settingsElement(settings);
+
+      // 8.解析 <environments> 标签
       // read it after objectFactory and objectWrapperFactory issue #631
       environmentsElement(root.evalNode("environments"));
       databaseIdProviderElement(root.evalNode("databaseIdProvider"));
@@ -123,6 +140,13 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * <settings></settings> 相当于是 Configuration 类的全局设置，通过 setter 方法注入配置的属性
+   * 获取 Configuration 类，检验 <settings></settings> 里面的子标签必须要有对应的 setter 方法
+   *
+   * @param context
+   * @return
+   */
   private Properties settingsAsProperties(XNode context) {
     if (context == null) {
       return new Properties();
@@ -145,7 +169,7 @@ public class XMLConfigBuilder extends BaseBuilder {
       for (String clazz : clazzes) {
         if (!clazz.isEmpty()) {
           @SuppressWarnings("unchecked")
-          Class<? extends VFS> vfsImpl = (Class<? extends VFS>)Resources.classForName(clazz);
+          Class<? extends VFS> vfsImpl = (Class<? extends VFS>) Resources.classForName(clazz);
           configuration.setVfsImpl(vfsImpl);
         }
       }
@@ -160,7 +184,7 @@ public class XMLConfigBuilder extends BaseBuilder {
   private void typeAliasesElement(XNode parent) {
     if (parent != null) {
       for (XNode child : parent.getChildren()) {
-        if ("package".equals(child.getName())) {
+        if ("package".equals(child.getName())) {  //
           String typeAliasPackage = child.getStringAttribute("name");
           configuration.getTypeAliasRegistry().registerAliases(typeAliasPackage);
         } else {
@@ -196,8 +220,10 @@ public class XMLConfigBuilder extends BaseBuilder {
   private void objectFactoryElement(XNode context) throws Exception {
     if (context != null) {
       String type = context.getStringAttribute("type");
+      // 解析标签下的所有 <property> 属性标签
       Properties properties = context.getChildrenAsProperties();
       ObjectFactory factory = (ObjectFactory) resolveClass(type).getDeclaredConstructor().newInstance();
+      // ObjectFactory 必须要实现 setProperties 方法，用于设置预制的属性
       factory.setProperties(properties);
       configuration.setObjectFactory(factory);
     }
