@@ -28,7 +28,7 @@ import org.apache.ibatis.session.Configuration;
 public class StaticSqlSource implements SqlSource {
 
   private final String sql;
-  private final List<ParameterMapping> parameterMappings;
+  private final List<ParameterMapping> parameterMappings; // 相当于是 #{} 里面的 javaType、jdbcType 等的抽象
   private final Configuration configuration;
 
   public StaticSqlSource(Configuration configuration, String sql) {

@@ -132,8 +132,14 @@ public class XMLConfigBuilder extends BaseBuilder {
       // 8.解析 <environments> 标签
       // read it after objectFactory and objectWrapperFactory issue #631
       environmentsElement(root.evalNode("environments"));
+
+      //
       databaseIdProviderElement(root.evalNode("databaseIdProvider"));
+
+      //
       typeHandlerElement(root.evalNode("typeHandlers"));
+
+      //
       mapperElement(root.evalNode("mappers"));
     } catch (Exception e) {
       throw new BuilderException("Error parsing SQL Mapper Configuration. Cause: " + e, e);
@@ -394,13 +400,22 @@ public class XMLConfigBuilder extends BaseBuilder {
   private void mapperElement(XNode parent) throws Exception {
     if (parent != null) {
       for (XNode child : parent.getChildren()) {
+        // 配置包扫描路径
         if ("package".equals(child.getName())) {
           String mapperPackage = child.getStringAttribute("name");
+          // 解析注解
           configuration.addMappers(mapperPackage);
         } else {
           String resource = child.getStringAttribute("resource");
           String url = child.getStringAttribute("url");
           String mapperClass = child.getStringAttribute("class");
+          // 同一个 mapper 标签中 resource、url、class 只能有一个
+          //  <mappers>
+          //    <mapper resource="org/apache/ibatis/builder/BlogMapper.xml"/>
+          //    <mapper url="file:./src/test/java/org/apache/ibatis/builder/NestedBlogMapper.xml"/>
+          //    <mapper class="org.apache.ibatis.builder.CachedAuthorMapper"/>
+          //    <package name="org.apache.ibatis.builder.mapper"/>
+          //  </mappers>
           if (resource != null && url == null && mapperClass == null) {
             ErrorContext.instance().resource(resource);
             try(InputStream inputStream = Resources.getResourceAsStream(resource)) {
