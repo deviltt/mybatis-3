@@ -33,6 +33,8 @@ public class ParameterMapping {
   private ParameterMode mode;
   private Class<?> javaType = Object.class;
   private JdbcType jdbcType;
+
+  // 精度
   private Integer numericScale;
   private TypeHandler<?> typeHandler;
   private String resultMapId;

@@ -54,6 +54,7 @@ public class XMLStatementBuilder extends BaseBuilder {
   }
 
   public void parseStatementNode() {
+    // <select>、<update>、<delete>、<insert> 这几个标签都有 id、databaseId 属性
     String id = context.getStringAttribute("id");
     String databaseId = context.getStringAttribute("databaseId");
 
@@ -61,19 +62,26 @@ public class XMLStatementBuilder extends BaseBuilder {
       return;
     }
 
-    // 根据 sql 节点的名称决定其 SqlCommandType
+    // 根据 sql 节点的名称 nodeName 决定其 SqlCommandType
     String nodeName = context.getNode().getNodeName();
+
+    // SqlCommandType 是 Enum 类型，所以可以直接使用 valueOf() 赋值
     SqlCommandType sqlCommandType = SqlCommandType.valueOf(nodeName.toUpperCase(Locale.ENGLISH));
+
+    // <update>、<delete>、<insert> 三个标签需要刷新缓存
     boolean isSelect = sqlCommandType == SqlCommandType.SELECT;
     boolean flushCache = context.getBooleanAttribute("flushCache", !isSelect);
+
+    // 只有 <select> 标签才需要缓存
     boolean useCache = context.getBooleanAttribute("useCache", isSelect);
     boolean resultOrdered = context.getBooleanAttribute("resultOrdered", false);
 
     // Include Fragments before parsing
-    XMLIncludeTransformer includeParser = new XMLIncludeTransformer(configuration, builderAssistant);
-
     // 解析 <include> 标签
+    XMLIncludeTransformer includeParser = new XMLIncludeTransformer(configuration, builderAssistant);
     // 在这个里面对 ${} 符号进行替换，也就是和 #{} 的区别
+    // 在这个地方就会把 <select>、<update>、<delete>、<insert> 标签里面的 <include> 标签给替换掉了
+    // 所以这 4 个标签里面只会有 <if>、<choose>、<when>。。。。 这 9 个标签了
     includeParser.applyIncludes(context.getNode());
 
     String parameterType = context.getStringAttribute("parameterType");
@@ -98,7 +106,10 @@ public class XMLStatementBuilder extends BaseBuilder {
           ? Jdbc3KeyGenerator.INSTANCE : NoKeyGenerator.INSTANCE;
     }
 
+    // 重点解析标签里的 sql，生成 SqlSource
     SqlSource sqlSource = langDriver.createSqlSource(configuration, context, parameterTypeClass);
+
+    // 指定 Statement 的类型，默认是 PreparedStatement（也是使用 jdbc 推荐的 statement）
     StatementType statementType = StatementType.valueOf(context.getStringAttribute("statementType", StatementType.PREPARED.toString()));
     Integer fetchSize = context.getIntAttribute("fetchSize");
     Integer timeout = context.getIntAttribute("timeout");

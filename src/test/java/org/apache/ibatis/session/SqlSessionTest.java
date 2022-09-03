@@ -168,10 +168,13 @@ class SqlSessionTest extends BaseDataTest {
     }
   }
 
+  /**
+   * selectMap 方法，指定 key，查询返回 map 类型集合，就不用自己查询返回 List，然后再转换成 Map，可以直接使用 selectMap
+   */
   @Test
   void shouldSelectAllAuthorsAsMap() {
     try (SqlSession session = sqlMapper.openSession(TransactionIsolationLevel.SERIALIZABLE)) {
-      // 指定 mapKey，然后将 mapKey 和查询结果做映射返回
+      // 指定 mapKey，然后将 mapKey 作为键值，查询结果作为 value，封装成 map 返回
       final Map<Integer,Author> authors = session.selectMap("org.apache.ibatis.domain.blog.mappers.AuthorMapper.selectAllAuthors", "id");
       assertEquals(2, authors.size());
       for(Map.Entry<Integer,Author> authorEntry : authors.entrySet()) {
@@ -183,6 +186,7 @@ class SqlSessionTest extends BaseDataTest {
   @Test
   void shouldSelectCountOfPosts() {
     try (SqlSession session = sqlMapper.openSession()) {
+      // 指定 resultType 为 int 类型
       Integer count = session.selectOne("org.apache.ibatis.domain.blog.mappers.BlogMapper.selectCountOfPosts");
       assertEquals(5, count.intValue());
     }

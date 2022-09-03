@@ -121,6 +121,7 @@ public class TypeAliasRegistry {
       if (typeAliases.containsKey(key)) {
         value = (Class<T>) typeAliases.get(key);
       } else {
+        // 从这可以看出，必须要用可加载的类型，否则会抛出 ClassNotFoundException
         value = (Class<T>) Resources.classForName(string);
       }
       return value;

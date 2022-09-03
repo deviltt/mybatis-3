@@ -159,8 +159,10 @@ public class BeanWrapper extends BaseWrapper {
 
   private Object getBeanProperty(PropertyTokenizer prop, Object object) {
     try {
+      // 根据属性名，获取 class 中该属性的 getter 方法
       Invoker method = metaClass.getGetInvoker(prop.getName());
       try {
+        // 反射调用属性的 get 方法，获取属性对应值
         return method.invoke(object, NO_ARGUMENTS);
       } catch (Throwable t) {
         throw ExceptionUtil.unwrapThrowable(t);
