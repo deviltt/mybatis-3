@@ -81,13 +81,15 @@ public class XMLScriptBuilder extends BaseBuilder {
     for (int i = 0; i < children.getLength(); i++) {
       XNode child = node.newXNode(children.item(i));
       if (child.getNode().getNodeType() == Node.CDATA_SECTION_NODE || child.getNode().getNodeType() == Node.TEXT_NODE) {
-        // 如果是文本标签
+        // 如果是 text 文本或者 CDATA 类型的内容
         String data = child.getStringBody("");
+        // 用 TextSqlNode 对 text 进行包装
         TextSqlNode textSqlNode = new TextSqlNode(data);
         if (textSqlNode.isDynamic()) {
           contents.add(textSqlNode);
           isDynamic = true;
         } else {
+          // 如果是非 Dynamic 类型，即用 #{} 注入传参，sql 文本 用 StaticTextSqlNode 进行包装
           contents.add(new StaticTextSqlNode(data));
         }
       } else if (child.getNode().getNodeType() == Node.ELEMENT_NODE) { // issue #628

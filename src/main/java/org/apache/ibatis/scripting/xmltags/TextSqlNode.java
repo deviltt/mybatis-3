@@ -45,8 +45,11 @@ public class TextSqlNode implements SqlNode {
   }
 
   public boolean isDynamic() {
+    // 1.构造TokenHandler
     DynamicCheckerTokenParser checker = new DynamicCheckerTokenParser();
+    // 2.构造GenericTokenParser，用于解析${}
     GenericTokenParser parser = createParser(checker);
+    // 3.解析sql文本
     parser.parse(text);
     return checker.isDynamic();
   }
