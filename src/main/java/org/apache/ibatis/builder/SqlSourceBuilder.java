@@ -101,6 +101,7 @@ public class SqlSourceBuilder extends BaseBuilder {
       } else if (property == null || Map.class.isAssignableFrom(parameterType)) {
         propertyType = Object.class;
       } else {
+        // ReflectorFactory 默认都是 DefaultReflectorFactory，里面的 reflectorMap 缓存了解析过的类的反射工具
         MetaClass metaClass = MetaClass.forClass(parameterType, configuration.getReflectorFactory());
         if (metaClass.hasGetter(property)) {
           propertyType = metaClass.getGetterType(property);

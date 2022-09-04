@@ -201,6 +201,7 @@ class SqlSessionTest extends BaseDataTest {
 
   @Test
   void shouldSelectOneAuthor() {
+
     try (SqlSession session = sqlMapper.openSession()) {
       Author author = session.selectOne(
           "org.apache.ibatis.domain.blog.mappers.AuthorMapper.selectAuthor", new Author(101));

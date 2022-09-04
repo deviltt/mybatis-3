@@ -22,6 +22,10 @@ import org.apache.ibatis.util.MapUtil;
 
 public class DefaultReflectorFactory implements ReflectorFactory {
   private boolean classCacheEnabled = true;
+
+  /**
+   * 会把解析过的实体类缓存起来
+   */
   private final ConcurrentMap<Class<?>, Reflector> reflectorMap = new ConcurrentHashMap<>();
 
   public DefaultReflectorFactory() {
