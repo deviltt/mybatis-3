@@ -47,6 +47,7 @@ public class XMLScriptBuilder extends BaseBuilder {
     super(configuration);
     this.context = context;
     this.parameterType = parameterType;
+    // 初始化 <if>、<choose>、<when>、<where>、<otherwise>、<foreach>、<set>、<bind>、<trim> 这几个标签的 handler
     initNodeHandlerMap();
   }
 

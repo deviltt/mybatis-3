@@ -26,6 +26,7 @@ import org.apache.ibatis.type.SimpleTypeRegistry;
  * TestSqlNode 表示的是包含 "${}" 占位符的动态 SQL 节点，
  *
  * TextSqlNode.apply() 会将 "id=${id}" 中的 "${id}" 占位符直接替换成 "1" ，得到 "id=1"，
+ * 这个机制可以造成 sql 注入，因为是直接替换，所以可以用 "id = 任意值 or 1 = 1" 绕过判断，造成 bug
  * 并将其追加到 DynamicContext 中
  *
  * @author Clinton Begin

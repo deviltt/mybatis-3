@@ -210,6 +210,17 @@ class SqlSessionTest extends BaseDataTest {
   }
 
   @Test
+  void shouldSelectOneAuthor1() {
+    try (SqlSession session = sqlMapper.openSession()) {
+      Author author = session.selectOne(
+        "org.apache.ibatis.domain.blog.mappers.AuthorMapper.selectAuthor1", "'news' or 1 = 1");
+//        "org.apache.ibatis.domain.blog.mappers.AuthorMapper.selectAuthor1", "'news' or 1 = 1");
+      assertEquals(101, author.getId());
+      assertEquals(Section.NEWS, author.getFavouriteSection());
+    }
+  }
+
+  @Test
   void shouldSelectOneAuthorAsList() {
     try (SqlSession session = sqlMapper.openSession()) {
       List<Author> authors = session.selectList(
