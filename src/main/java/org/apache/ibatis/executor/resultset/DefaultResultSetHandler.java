@@ -200,6 +200,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     int resultSetCount = 0;
     ResultSetWrapper rsw = getFirstResultSet(stmt);
 
+    // <mapper> 里面配的所有的 <resultMap> 的抽象集合
     List<ResultMap> resultMaps = mappedStatement.getResultMaps();
     int resultMapCount = resultMaps.size();
     validateResultMapsCount(rsw, resultMapCount);
@@ -251,6 +252,9 @@ public class DefaultResultSetHandler implements ResultSetHandler {
 
   private ResultSetWrapper getFirstResultSet(Statement stmt) throws SQLException {
     ResultSet rs = stmt.getResultSet(); // 获取 ResultSet 对象
+
+    // 对 getMoreResults、getUpdateCount 解释比较好的文章
+    // https://www.cnblogs.com/shenliang123/archive/2011/10/25/2224346.html
     while (rs == null) {
       // move forward to get the first resultset in case the driver
       // doesn't return the resultset as the first result (HSQLDB 2.1)
@@ -653,6 +657,8 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     final List<Class<?>> constructorArgTypes = new ArrayList<>();
     final List<Object> constructorArgs = new ArrayList<>();
     Object resultObject = createResultObject(rsw, resultMap, constructorArgTypes, constructorArgs, columnPrefix);
+
+    // 如果找到了对应的 TypeHandler，那在 createResultObject 方法里就已经得到真实结果了，所以这里不用再通过 PropertyMapping 进行映射
     if (resultObject != null && !hasTypeHandlerForResultObject(rsw, resultMap.getType())) {
       final List<ResultMapping> propertyMappings = resultMap.getPropertyResultMappings();
       for (ResultMapping propertyMapping : propertyMappings) {
@@ -669,16 +675,19 @@ public class DefaultResultSetHandler implements ResultSetHandler {
 
   private Object createResultObject(ResultSetWrapper rsw, ResultMap resultMap, List<Class<?>> constructorArgTypes, List<Object> constructorArgs, String columnPrefix)
       throws SQLException {
-    // 返回类型，就是我们在 <resultMap> 标签中配置的 type
+    // 返回类型，就是我们在 <resultMap> 标签中配置的 type 属性
+    // <resultMap id="selectAuthor" type="org.apache.ibatis.domain.blog.Author">
     final Class<?> resultType = resultMap.getType();
-    // 把 class 类型封装成 Reflector
+    // 把 class 类型反射成 Reflector 封装在 MetaClass 对象中
     final MetaClass metaType = MetaClass.forClass(resultType, reflectorFactory);
     final List<ResultMapping> constructorMappings = resultMap.getConstructorResultMappings();
     if (hasTypeHandlerForResultObject(rsw, resultType)) {
+      // 判断 resultType 是否有 resultTypeHandler
       return createPrimitiveResultObject(rsw, resultMap, columnPrefix);
     } else if (!constructorMappings.isEmpty()) {
       return createParameterizedResultObject(rsw, resultType, constructorMappings, constructorArgTypes, constructorArgs, columnPrefix);
     } else if (resultType.isInterface() || metaType.hasDefaultConstructor()) {
+      // 如果是接口或者有默认构造函数，则直接创建对象（接口会有默认的实现类）
       return objectFactory.create(resultType);
     } else if (shouldApplyAutomaticMappings(resultMap, false)) {
       return createByConstructorSignature(rsw, resultMap, columnPrefix, resultType, constructorArgTypes, constructorArgs);
