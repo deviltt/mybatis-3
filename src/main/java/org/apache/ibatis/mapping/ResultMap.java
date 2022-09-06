@@ -37,17 +37,66 @@ import org.apache.ibatis.session.Configuration;
 public class ResultMap {
   private Configuration configuration;
 
+  /**
+   * <resultMap> 节点的 id 属性
+   */
   private String id;
+
+  /**
+   * <resultMap> 节点的 type 属性
+   */
   private Class<?> type;
+
+  /**
+   * 记录除了 <disciminator> 节点之外的其它映射关系（即 ResultMapping 对象集合）
+   */
   private List<ResultMapping> resultMappings;
+
+  /**
+   * 记录映射关系中带有 ID 标志的映射关系，例如 <id> 节点和 <constructor> 节点的 <idArg> 子节点
+   */
   private List<ResultMapping> idResultMappings;
+
+  /**
+   * 记录了映射关系中带有 Constructor 标志的映射关系，例如 <constructor> 所有子元素
+   */
   private List<ResultMapping> constructorResultMappings;
+
+  /**
+   * 记录了映射关系中不带有 Constructor 标志的映射关系
+   */
   private List<ResultMapping> propertyResultMappings;
+
+  /**
+   * 记录所有映射关系中涉及的 column 属性的集合
+   * column 表示的是数据库中的字段名称
+   */
   private Set<String> mappedColumns;
+
+  /**
+   * 记录所有映射关系中涉及的 property 属性的集合
+   * column 表示的是 pojo 中的字段名称
+   */
   private Set<String> mappedProperties;
+
+  /**
+   * 鉴别器，对应 <discriminator> 节点
+   */
   private Discriminator discriminator;
+
+  /**
+   * 是否含有嵌套的结果映射，如果某个映射关系中存在 resultMap 属性，且不存在 resultSet 属性，则为 true
+   */
   private boolean hasNestedResultMaps;
+
+  /**
+   * 是否存在嵌套查询，如果某个属性映射存在 select 属性，则为 true
+   */
   private boolean hasNestedQueries;
+
+  /**
+   * 是否开启自动映射
+   */
   private Boolean autoMapping;
 
   private ResultMap() {
