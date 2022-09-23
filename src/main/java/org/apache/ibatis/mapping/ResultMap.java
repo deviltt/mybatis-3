@@ -89,6 +89,8 @@ public class ResultMap {
       resultMap.constructorResultMappings = new ArrayList<>();
       resultMap.propertyResultMappings = new ArrayList<>();
       final List<String> constructorArgNames = new ArrayList<>();
+
+      // 遍历每个 ResultMapping
       for (ResultMapping resultMapping : resultMap.resultMappings) {
         resultMap.hasNestedQueries = resultMap.hasNestedQueries || resultMapping.getNestedQueryId() != null;
         resultMap.hasNestedResultMaps = resultMap.hasNestedResultMaps || (resultMapping.getNestedResultMapId() != null && resultMapping.getResultSet() == null);
@@ -123,6 +125,7 @@ public class ResultMap {
         resultMap.idResultMappings.addAll(resultMap.resultMappings);
       }
       if (!constructorArgNames.isEmpty()) {
+        // 如果是通过 <constructor> 标签创建实例，那要看 type 对应的构造函数，是否和 constructor 标签里面的匹配
         final List<String> actualArgNames = argNamesOfMatchingConstructor(constructorArgNames);
         if (actualArgNames == null) {
           throw new BuilderException("Error in result map '" + resultMap.id

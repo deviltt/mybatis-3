@@ -425,6 +425,8 @@ public class DefaultResultSetHandler implements ResultSetHandler {
       if (shouldApplyAutomaticMappings(resultMap, false)) {
         foundValues = applyAutomaticMappings(rsw, resultMap, metaObject, columnPrefix) || foundValues;
       }
+
+      // 获取 <resultMap> 下的所有 <result> 对应的属性，然后做映射
       foundValues = applyPropertyMappings(rsw, resultMap, metaObject, lazyLoader, columnPrefix) || foundValues;
       foundValues = lazyLoader.size() > 0 || foundValues;
       rowValue = foundValues || configuration.isReturnInstanceForEmptyRow() ? rowValue : null;
@@ -660,6 +662,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
 
     // 如果找到了对应的 TypeHandler，那在 createResultObject 方法里就已经得到真实结果了，所以这里不用再通过 PropertyMapping 进行映射
     if (resultObject != null && !hasTypeHandlerForResultObject(rsw, resultMap.getType())) {
+      // 获取 <resultMap> 下的所有 <result> 对应的属性
       final List<ResultMapping> propertyMappings = resultMap.getPropertyResultMappings();
       for (ResultMapping propertyMapping : propertyMappings) {
         // issue gcode #109 && issue #149

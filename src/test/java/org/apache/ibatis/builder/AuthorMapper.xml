@@ -26,6 +26,13 @@
 <!--        <parameter property="id" />-->
 <!--    </parameterMap>-->
 
+  <resultMap id="" type="name">
+    <constructor>
+      <idArg name="" column=""
+      <arg name="" resultMap=""
+    </constructor>
+  </resultMap>
+
     <resultMap id="selectAuthor" type="org.apache.ibatis.domain.blog.Author">
         <id column="id" property="id" />
         <result property="username" column="username" />

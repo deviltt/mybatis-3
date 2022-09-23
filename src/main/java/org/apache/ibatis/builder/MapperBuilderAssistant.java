@@ -206,6 +206,8 @@ public class MapperBuilderAssistant extends BaseBuilder {
     ResultMap resultMap = new ResultMap.Builder(configuration, id, type, resultMappings, autoMapping)
         .discriminator(discriminator)
         .build();
+
+    // 每个 resultMapping 都会保存在全局唯一的 Configuration 对象中
     configuration.addResultMap(resultMap);
     return resultMap;
   }

@@ -222,6 +222,7 @@ public class MapperMethod {
     private final SqlCommandType type;
 
     public SqlCommand(Configuration configuration, Class<?> mapperInterface, Method method) {
+      // 获取调用方法的名称
       final String methodName = method.getName();
       final Class<?> declaringClass = method.getDeclaringClass();
       MappedStatement ms = resolveMappedStatement(mapperInterface, methodName, declaringClass,
