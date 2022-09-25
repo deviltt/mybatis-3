@@ -39,15 +39,17 @@ public class DefaultCursor<T> implements Cursor<T> {
   // ResultSetHandler stuff
   private final DefaultResultSetHandler resultSetHandler;
   private final ResultMap resultMap;
-  private final ResultSetWrapper rsw;
-  private final RowBounds rowBounds;
+  private final ResultSetWrapper rsw; // 封装了结果集的元数据信息
+  private final RowBounds rowBounds;  // 指定了对结果集进行映射的起止位置
+
+  // 暂存映射的结果对象
   protected final ObjectWrapperResultHandler<T> objectWrapperResultHandler = new ObjectWrapperResultHandler<>();
 
   private final CursorIterator cursorIterator = new CursorIterator();
-  private boolean iteratorRetrieved;
+  private boolean iteratorRetrieved;  // 标识是否正在迭代结果集
 
   private CursorStatus status = CursorStatus.CREATED;
-  private int indexWithRowBound = -1;
+  private int indexWithRowBound = -1; // 记录已经完成映射的行数
 
   private enum CursorStatus {
 
@@ -205,13 +207,13 @@ public class DefaultCursor<T> implements Cursor<T> {
       T next = object;
 
       if (!objectWrapperResultHandler.fetched) {
-        next = fetchNextUsingRowBound();
+        next = fetchNextUsingRowBound();  // 对结果集进行映射的核心
       }
 
       if (objectWrapperResultHandler.fetched) {
         objectWrapperResultHandler.fetched = false;
         object = null;
-        iteratorIndex++;
+        iteratorIndex++;  // 记录返回结果对象的个数
         return next;
       }
       throw new NoSuchElementException();

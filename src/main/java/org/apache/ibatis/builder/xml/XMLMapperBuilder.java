@@ -56,6 +56,8 @@ import org.apache.ibatis.type.TypeHandler;
 public class XMLMapperBuilder extends BaseBuilder {
 
   private final XPathParser parser;
+
+  // 一个 Mapper 文件对应一个自身的 MapperBuilderAssistant
   private final MapperBuilderAssistant builderAssistant;
   private final Map<String, XNode> sqlFragments;
   private final String resource;
@@ -304,12 +306,15 @@ public class XMLMapperBuilder extends BaseBuilder {
       } else {
         // 这里就有可能是 id、result、collection、association
         List<ResultFlag> flags = new ArrayList<>();
+        // 处理 <resultMap> 下面的 <id> 标签
         if ("id".equals(resultChild.getName())) {
           flags.add(ResultFlag.ID);
         }
         resultMappings.add(buildResultMappingFromContext(resultChild, typeClass, flags));
       }
     }
+
+    // <resultMap> 标签自身的 4 个属性，id、extends、autoMapping、type
     String id = resultMapNode.getStringAttribute("id",
       resultMapNode.getValueBasedIdentifier());
     String extend = resultMapNode.getStringAttribute("extends");

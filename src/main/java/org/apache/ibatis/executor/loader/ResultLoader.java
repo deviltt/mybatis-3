@@ -47,6 +47,10 @@ public class ResultLoader {
   protected final ObjectFactory objectFactory;
   protected final CacheKey cacheKey;
   protected final BoundSql boundSql;
+
+  /**
+   * 负责将延迟加载得到的结果对象转换成 targetType 类型的对象
+   */
   protected final ResultExtractor resultExtractor;
   protected final long creatorThreadId;
 
@@ -66,18 +70,33 @@ public class ResultLoader {
     this.creatorThreadId = Thread.currentThread().getId();
   }
 
+  /**
+   * 功能：通过 Executor 执行 ResultLoader 中记录的 SQL 语句并返回相应的延迟加载对象，
+   * 并将加载得到的嵌套对象设置到外层对象中
+   *
+   * @return
+   * @throws SQLException
+   */
   public Object loadResult() throws SQLException {
+    // 执行延迟加载，得到结果对象，并以 List 类型返回
     List<Object> list = selectList();
+    // 将 list 集合转换成 targetType 指定类型的对象
     resultObject = resultExtractor.extractObjectFromList(list, targetType);
     return resultObject;
   }
 
   private <E> List<E> selectList() throws SQLException {
+    // 记录执行延迟加载的 Executor 对象
     Executor localExecutor = executor;
+
+    // 检测当前线程是否为创建 ResultLoader 对象的线程、检测 localExecutor 是否关闭
     if (Thread.currentThread().getId() != this.creatorThreadId || localExecutor.isClosed()) {
+      // 创建新的 Executor 对象来执行延迟加载操作
       localExecutor = newExecutor();
     }
     try {
+      // 执行查询操作，得到延迟加载对象
+      // 一个可以执行 SQL 语句并将结果集映射成结果对象的黑盒
       return localExecutor.query(mappedStatement, parameterObject, RowBounds.DEFAULT, Executor.NO_RESULT_HANDLER, cacheKey, boundSql);
     } finally {
       if (localExecutor != executor) {

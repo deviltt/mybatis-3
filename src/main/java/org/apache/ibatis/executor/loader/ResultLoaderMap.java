@@ -75,6 +75,13 @@ public class ResultLoaderMap {
     return loaderMap.containsKey(property.toUpperCase(Locale.ENGLISH));
   }
 
+  /**
+   * 加载指定名称的延迟加载属性
+   *
+   * @param property
+   * @return
+   * @throws SQLException
+   */
   public boolean load(String property) throws SQLException {
     LoadPair pair = loaderMap.remove(property.toUpperCase(Locale.ENGLISH));
     if (pair != null) {
@@ -88,6 +95,11 @@ public class ResultLoaderMap {
     loaderMap.remove(property.toUpperCase(Locale.ENGLISH));
   }
 
+  /**
+   * 加载该对象中全部的延迟加载属性
+   *
+   * @throws SQLException
+   */
   public void loadAll() throws SQLException {
     final Set<String> methodNameSet = loaderMap.keySet();
     String[] methodNames = methodNameSet.toArray(new String[methodNameSet.size()]);
@@ -117,10 +129,14 @@ public class ResultLoaderMap {
     private final transient Object serializationCheck = new Object();
     /**
      * Meta object which sets loaded properties.
+     *
+     * 外层对象（一般是外层对象的代理对象）对应的 MetaObject 对象
      */
     private transient MetaObject metaResultObject;
     /**
      * Result loader which loads unread properties.
+     *
+     * 负责加载延迟加载属性的 ResultLoader
      */
     private transient ResultLoader resultLoader;
     /**
@@ -133,10 +149,14 @@ public class ResultLoaderMap {
     private Class<?> configurationFactory;
     /**
      * Name of the unread property.
+     *
+     * 延迟加载的属性名称
      */
     private String property;
     /**
      * ID of SQL statement which loads the property.
+     *
+     * 用于加载属性的 SQL 语句的 ID
      */
     private String mappedStatement;
     /**
