@@ -200,7 +200,8 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     int resultSetCount = 0;
     ResultSetWrapper rsw = getFirstResultSet(stmt);
 
-    // <mapper> 里面配的所有的 <resultMap> 的抽象集合
+    // <select、update、delete、insert> 里面配的所有的 <resultMap> 的抽象集合
+    // 可能有多个 ResultMap
     List<ResultMap> resultMaps = mappedStatement.getResultMaps();
     int resultMapCount = resultMaps.size();
     validateResultMapsCount(rsw, resultMapCount);
