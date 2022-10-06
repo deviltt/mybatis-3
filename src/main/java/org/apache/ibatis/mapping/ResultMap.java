@@ -48,7 +48,7 @@ public class ResultMap {
   private Class<?> type;
 
   /**
-   * 记录除了 <disciminator> 节点之外的其它映射关系（即 ResultMapping 对象集合）
+   * 记录除了 <discriminator> 节点之外的其它映射关系（即 ResultMapping 对象集合）
    */
   private List<ResultMapping> resultMappings;
 

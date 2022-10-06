@@ -198,6 +198,8 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     final List<Object> multipleResults = new ArrayList<>();
 
     int resultSetCount = 0;
+
+    // 获取 statement 里面的第一个结果集，并用 ResultSetWrapper 包装
     ResultSetWrapper rsw = getFirstResultSet(stmt);
 
     // <select、update、delete、insert> 里面配的所有的 <resultMap> 的抽象集合
@@ -430,18 +432,30 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   // GET VALUE FROM ROW FOR SIMPLE RESULT MAP
   //
 
+  /**
+   * 1.根据 type 创建对象
+   * 2.把 Object 对象封装成 MetaObject
+   * 3.resultMappings 映射，填充对象属性
+   *
+   * @param rsw
+   * @param resultMap
+   * @param columnPrefix
+   * @return
+   * @throws SQLException
+   */
   private Object getRowValue(ResultSetWrapper rsw, ResultMap resultMap, String columnPrefix) throws SQLException {
     final ResultLoaderMap lazyLoader = new ResultLoaderMap();
+    // 1.rowValue 表示一行数据的值，那肯定是映射了所有的列，即 resultMappings
     Object rowValue = createResultObject(rsw, resultMap, lazyLoader, columnPrefix);
     if (rowValue != null && !hasTypeHandlerForResultObject(rsw, resultMap.getType())) {
-      // rowValue 封装在 MetaObject 里面，实际就是 type 类型的对象，用父类 Object 声明而已
+      // 2.rowValue 封装在 MetaObject 里面，实际就是 type 类型的对象，用父类 Object 声明而已
       final MetaObject metaObject = configuration.newMetaObject(rowValue);
       boolean foundValues = this.useConstructorMappings;
       if (shouldApplyAutomaticMappings(resultMap, false)) {
         foundValues = applyAutomaticMappings(rsw, resultMap, metaObject, columnPrefix) || foundValues;
       }
 
-      // 获取 <resultMap> 下的所有 <result> 对应的属性，然后做映射
+      // 3.为对象设置属性，即获取 <resultMap> 下的所有 <result> 对应的属性，然后做映射
       foundValues = applyPropertyMappings(rsw, resultMap, metaObject, lazyLoader, columnPrefix) || foundValues;
       foundValues = lazyLoader.size() > 0 || foundValues;
       rowValue = foundValues || configuration.isReturnInstanceForEmptyRow() ? rowValue : null;
@@ -518,8 +532,11 @@ public class DefaultResultSetHandler implements ResultSetHandler {
       throws SQLException {
     final List<String> mappedColumnNames = rsw.getMappedColumnNames(resultMap, columnPrefix);
     boolean foundValues = false;
+
+    // 获取所有 propertyResultMappings
     final List<ResultMapping> propertyMappings = resultMap.getPropertyResultMappings();
     for (ResultMapping propertyMapping : propertyMappings) {
+      // <result> 标签中的 column 属性
       String column = prependPrefix(propertyMapping.getColumn(), columnPrefix);
       if (propertyMapping.getNestedResultMapId() != null) {
         // the user added a column attribute to a nested result map, ignore it
@@ -530,6 +547,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
           || propertyMapping.getResultSet() != null) {
         Object value = getPropertyMappingValue(rsw.getResultSet(), metaObject, propertyMapping, lazyLoader, columnPrefix);
         // issue #541 make property optional
+        // 获取 pojo 对象里面的属性 property
         final String property = propertyMapping.getProperty();
         if (property == null) {
           continue;

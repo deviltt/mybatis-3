@@ -92,6 +92,7 @@ public class XMLStatementBuilder extends BaseBuilder {
 
     // Parse selectKey after includes and remove them.
     // 处理 <selectKey> 节点
+    // 只有 <insert> 和 <update> 标签才有 selectKey 属性
     processSelectKeyNodes(id, parameterTypeClass, langDriver);
 
     // Parse the SQL (pre: <selectKey> and <include> were parsed and removed)

@@ -212,6 +212,12 @@ public class XMLMapperBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * 功能：
+   * 根据 cache-ref 找到对应的 cache，然后保存到 builderAssistant 中的 currentCache 引用中
+   *
+   * @param context
+   */
   private void cacheRefElement(XNode context) {
     if (context != null) {
       configuration.addCacheRef(builderAssistant.getCurrentNamespace(), context.getStringAttribute("namespace"));
@@ -228,7 +234,8 @@ public class XMLMapperBuilder extends BaseBuilder {
     if (context != null) {
       String type = context.getStringAttribute("type", "PERPETUAL");
       Class<? extends Cache> typeClass = typeAliasRegistry.resolveAlias(type);
-      // 默认使用 LRU 缓存
+      // eviction:回收
+      // 回收策略，默认使用 LRU 缓存
       String eviction = context.getStringAttribute("eviction", "LRU");
       Class<? extends Cache> evictionClass = typeAliasRegistry.resolveAlias(eviction);
       Long flushInterval = context.getLongAttribute("flushInterval");
@@ -288,6 +295,8 @@ public class XMLMapperBuilder extends BaseBuilder {
         resultMapNode.getStringAttribute("resultType",
           resultMapNode.getStringAttribute("javaType"))));
     Class<?> typeClass = resolveClass(type);
+
+    // 如果 type 类型解析出来为 null
     if (typeClass == null) {
       typeClass = inheritEnclosingType(resultMapNode, enclosingType);
     }
@@ -296,10 +305,12 @@ public class XMLMapperBuilder extends BaseBuilder {
 
     // 获取 <resultMap> 下的所有标签
     // resultMap 下面可能有 id、result、constructor、collection、association、discriminator
+    // 每个标签都抽象成 resultMapping，保存在 resultMappings 集合里面
     List<XNode> resultChildren = resultMapNode.getChildren();
 
     for (XNode resultChild : resultChildren) {
       if ("constructor".equals(resultChild.getName())) {
+        // <constructor> 下面的标签也会封装成 resultMapping，保存在 resultMappings 中
         processConstructorElement(resultChild, typeClass, resultMappings);
       } else if ("discriminator".equals(resultChild.getName())) {
         discriminator = processDiscriminatorElement(resultChild, typeClass, resultMappings);

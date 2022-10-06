@@ -94,6 +94,7 @@ public class CacheBuilder {
     Cache cache = newBaseCacheInstance(implementation, id);
     setCacheProperties(cache);
     // issue #352, do not apply decorators to custom caches
+    // 默认装饰：LRU -> Logging -> Synchronized
     if (PerpetualCache.class.equals(cache.getClass())) {
       for (Class<? extends Cache> decorator : decorators) {
         cache = newCacheDecoratorInstance(decorator, cache);
@@ -128,6 +129,8 @@ public class CacheBuilder {
       if (readWrite) {
         cache = new SerializedCache(cache);
       }
+
+      // 默认会用 LoggingCache、SynchronizedCache 装饰
       cache = new LoggingCache(cache);
       cache = new SynchronizedCache(cache);
       if (blocking) {
