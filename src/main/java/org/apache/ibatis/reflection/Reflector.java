@@ -69,8 +69,11 @@ public class Reflector {
   public Reflector(Class<?> clazz) {
     type = clazz;
     addDefaultConstructor(clazz);
+
+    // 反射获取 clazz 里面的方法
     Method[] classMethods = getClassMethods(clazz);
-    if (isRecord(type)) {
+
+    if (isRecord(type)) { // jdk8 以上版本有 isRecord 方法，所以处理方法不一样
       addRecordGetMethods(classMethods);
     } else {
       addGetMethods(classMethods);
@@ -293,6 +296,7 @@ public class Reflector {
     Class<?> currentClass = clazz;
     while (currentClass != null && currentClass != Object.class) {
       // 记录 class 类中所有的方法
+      // getDeclaredMethods 获取类里面所有方法，包括 private、protected 等作用域方法
       addUniqueMethods(uniqueMethods, currentClass.getDeclaredMethods());
 
       // we also need to look for interface methods -
@@ -315,6 +319,8 @@ public class Reflector {
 
   private void addUniqueMethods(Map<String, Method> uniqueMethods, Method[] methods) {
     for (Method currentMethod : methods) {
+//      https://www.zhihu.com/question/54895701
+//      https://www.lmlphp.com/user/16697/article/item/590564/
       if (!currentMethod.isBridge()) {
         String signature = getSignature(currentMethod);
         // check to see if the method is already known
